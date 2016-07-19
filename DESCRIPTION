@@ -1,0 +1,17 @@
+Package: ContextVariableCreation
+Type: Package
+Title: Create context variables of a data.frames to enable the analysis of panel
+    data with ordinary least square regression
+Version: 0.1.0
+Authors@R: person("Christian", "Olms", email = "git@christianolms.de", role = c("aut", "cre"))
+Description:
+License: LGPL
+LazyData: TRUE
+Depends:
+    AER,
+    data.table,
+    foreach
+Suggests:
+    knitr,ggplot2,rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1

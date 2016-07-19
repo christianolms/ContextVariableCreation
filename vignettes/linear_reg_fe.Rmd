@@ -1,0 +1,64 @@
+---
+title: "Linear regression and fixed effects"
+author: "Christian Olms<git@christianolms.de>"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{knitr,xtable,PaneldatenUeb}
+
+---
+
+#Dataset
+This packages contains the Fatalities dataset. The following code produces an overview of the columns.
+```{r, warning=FALSE, message=FALSE}
+library(ContextVariableCreation)
+library(data.table)
+library(foreach)
+library(ggplot2)
+data("Fatalities", package = "AER")
+#summary(Fatalities)
+```
+The dataset contains 7 rows for every of the 48 states for the years 1982 to 1988.
+First, add traffic death per 1000 miles.
+
+#Ordinary least square model
+```{r}
+Fatalities$frate <- with(Fatalities, fatal/pop * 10000)
+```
+Then create a ordinary least square model.
+
+```{r}
+mod_sig = frate~ beertax
+df_reg = create_context_variables_for_panel(Fatalities, group_variable = "state",time_dep_variables = c("beertax"))
+m1 = glm(formula = mod_sig, data = df_reg, family = gaussian())
+summary(m1)
+source("../R/plots.R")
+print(plot_residuals(residuals = m1$residuals, target = Fatalities$frate))
+```
+
+
+##Effect of countries
+
+```{r}
+ggplot(aes(x=frate,y=beertax, color=state), data = Fatalities)+geom_point()
+```
+
+Interpretation with beertax in us dollar:
+if beer tax  get higher, the slope
+
+Linear regression with fixed effects
+```{r}
+m2 = glm(formula = frate~ beertax + beertax_cv, data = df_reg, family = gaussian())
+summary(m2)
+print(plot_residuals(residuals = m2$residuals, target = Fatalities$frate))
+```
+
+##Model comparision
+
+
+```{r}
+anova(m1,m2)
+```
